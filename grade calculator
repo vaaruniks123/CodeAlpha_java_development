@@ -1,0 +1,73 @@
+import java.util.Scanner;
+
+public class GradeCalculator {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of students: ");
+        int numStudents = 0;
+        // Input validation for the number of students
+        while (true) {
+            try {
+                numStudents = scanner.nextInt();
+                if (numStudents <= 0) {
+                    throw new IllegalArgumentException("Number of students must be positive.");
+                }
+                break; // If input is valid, exit the loop
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a positive integer for the number of students.");
+                scanner.nextLine(); // Clear the buffer
+            }
+        }
+
+        // Create arrays to store student grades
+        int[] grades = new int[numStudents];
+
+        // Input loop to get grades from the teacher
+        for (int i = 0; i < numStudents; i++) {
+            while (true) {
+                try {
+                    System.out.print("Enter grade for student " + (i + 1) + ": ");
+                    int grade = scanner.nextInt();
+                    // Input validation for grades (assuming valid range is 0-100)
+                    if (grade < 0 || grade > 100) {
+                        throw new IllegalArgumentException("Grade must be between 0 and 100.");
+                    }
+                    grades[i] = grade;
+                    break; // If input is valid, exit the loop
+                } catch (Exception e) {
+                    System.out.println("Invalid input. Please enter an integer between 0 and 100 for the grade.");
+                    scanner.nextLine(); // Clear the buffer
+                }
+            }
+        }
+
+        // Calculate average, highest, and lowest scores
+        int sum = 0;
+        int highest = grades[0];
+        int lowest = grades[0];
+
+        for (int grade : grades) {
+            sum += grade;
+
+            if (grade > highest) {
+                highest = grade;
+            }
+
+            if (grade < lowest) {
+                lowest = grade;
+            }
+        }
+
+        // Calculate average
+        double average = (double) sum / numStudents;
+
+        // Display results
+        System.out.println("\nResults:");
+        System.out.println("Average Score: " + average);
+        System.out.println("Highest Score: " + highest);
+        System.out.println("Lowest Score: " + lowest);
+
+        scanner.close();
+    }
+}
