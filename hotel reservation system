@@ -1,0 +1,158 @@
+import java.util.*;
+
+// Room class representing a hotel room
+class Room {
+    private int id;
+    private String type;
+    private double price;
+    private boolean available;
+
+    public Room(int id, String type, double price) {
+        this.id = id;
+        this.type = type;
+        this.price = price;
+        this.available = true;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+}
+
+// Reservation class representing a room reservation
+class Reservation {
+    private int id;
+    private Room room;
+    private Date checkInDate;
+    private Date checkOutDate;
+    private double totalPrice;
+
+    public Reservation(int id, Room room, Date checkInDate, Date checkOutDate) {
+        this.id = id;
+        this.room = room;
+        this.checkInDate = checkInDate;
+        this.checkOutDate = checkOutDate;
+        this.totalPrice = calculateTotalPrice();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public Date getCheckInDate() {
+        return checkInDate;
+    }
+
+    public Date getCheckOutDate() {
+        return checkOutDate;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    private double calculateTotalPrice() {
+        long diffInMillies = checkOutDate.getTime() - checkInDate.getTime();
+        long diffInDays = diffInMillies / (1000 * 60 * 60 * 24); // Convert milliseconds to days
+        return room.getPrice() * diffInDays;
+    }
+}
+
+// Hotel class representing a hotel with rooms and reservations
+class Hotel {
+    private List<Room> rooms;
+    private List<Reservation> reservations;
+    private int nextReservationId;
+
+    public Hotel() {
+        rooms = new ArrayList<>();
+        reservations = new ArrayList<>();
+        nextReservationId = 1;
+        initializeRooms();
+    }
+
+    private void initializeRooms() {
+        rooms.add(new Room(1, "Single", 100.0));
+        rooms.add(new Room(2, "Double", 150.0));
+        rooms.add(new Room(3, "Suite", 250.0));
+    }
+
+    public List<Room> getAvailableRooms(Date checkInDate, Date checkOutDate) {
+        List<Room> availableRooms = new ArrayList<>();
+        for (Room room : rooms) {
+            if (room.isAvailable()) {
+                availableRooms.add(room);
+            }
+        }
+        return availableRooms;
+    }
+
+    public Reservation makeReservation(Room room, Date checkInDate, Date checkOutDate) {
+        Reservation reservation = new Reservation(nextReservationId++, room, checkInDate, checkOutDate);
+        room.setAvailable(false);
+        reservations.add(reservation);
+        return reservation;
+    }
+
+    public List<Reservation> getAllReservations() {
+        return reservations;
+    }
+}
+
+public class HotelReservationSystem {
+    public static void main(String[] args) {
+        Hotel hotel = new Hotel();
+
+        // Search for available rooms
+        Date checkInDate = new Date(); // Use current date for simplicity
+        Date checkOutDate = new Date(checkInDate.getTime() + (1000 * 60 * 60 * 24 * 3)); // Check out after 3 days
+        List<Room> availableRooms = hotel.getAvailableRooms(checkInDate, checkOutDate);
+
+        // Display available rooms
+        System.out.println("Available Rooms:");
+        for (Room room : availableRooms) {
+            System.out.println("Room ID: " + room.getId() + ", Type: " + room.getType() + ", Price: $" + room.getPrice());
+        }
+
+        // Make a reservation
+        if (!availableRooms.isEmpty()) {
+            Room selectedRoom = availableRooms.get(0); // Select the first available room
+            Reservation reservation = hotel.makeReservation(selectedRoom, checkInDate, checkOutDate);
+            System.out.println("\nReservation Details:");
+            System.out.println("Reservation ID: " + reservation.getId());
+            System.out.println("Room Type: " + reservation.getRoom().getType());
+            System.out.println("Check-In Date: " + reservation.getCheckInDate());
+            System.out.println("Check-Out Date: " + reservation.getCheckOutDate());
+            System.out.println("Total Price: $" + reservation.getTotalPrice());
+        }
+
+        // View all reservations
+        System.out.println("\nAll Reservations:");
+        List<Reservation> allReservations = hotel.getAllReservations();
+        for (Reservation reservation : allReservations) {
+            System.out.println("Reservation ID: " + reservation.getId() + ", Room Type: " + reservation.getRoom().getType()
+                    + ", Check-In: " + reservation.getCheckInDate() + ", Check-Out: " + reservation.getCheckOutDate()
+                    + ", Total Price: $" + reservation.getTotalPrice());
+        }
+    }
+}
